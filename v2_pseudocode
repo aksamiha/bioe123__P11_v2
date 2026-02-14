@@ -1,0 +1,48 @@
+spinCount = 0
+userSetSpeed = 0 
+userSetDuration = 0 
+cycleStartTime = 0 
+cycleOngoing = false 
+buttonPin = [button pin number]
+motorPin = [motor pin number] 
+displayPin = [PIN_NUMBER] 
+userInputRecieved = false
+
+function setup(): 
+initialize serial communication 
+set buttonPin as INPUT 
+set motorPin as OUTPUT 
+attach interrupt to buttonPin
+initialize display
+display “Enter speed (0-255) and duration (seconds).”
+
+function loop(): 
+if serial data available:
+		userSpeed = read inputted value
+		userDuration = read inputted value
+		userInputRecieved = true
+		display “Parameters set. Press button to start centrifugation cycle!”
+
+if cycleOngoing: 
+elapsedTime = current time - cycleStartTime 
+
+if elapsedTime >= userDuration:
+stop motor (set motorPin to 0) 
+cycleOngoing = false 
+display “Cycle complete” 
+reset spinCount to 0 
+
+else:
+set motor speed to userSpeed
+RPM = (spinCount / elapsedTime) * 60 
+display RPM 
+
+function buttonISR():
+	if userSpeed and userDuration have been set:
+		if not cycleOngoing:
+			cycleOngoing = true
+			cycleStartTime = current time
+			spinCount = 0
+
+function spinSensorISR():
+	spinCount ++
